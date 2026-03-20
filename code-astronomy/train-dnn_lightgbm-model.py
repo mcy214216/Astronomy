@@ -1,9 +1,7 @@
-# 创建时间   : 2025/4/11 01:43
+# 创建时间   : 2025/4/12 12:26
 # 作者      : 叶之瞳
-# 文件名     : 14.py
-# 创建时间   : 2025/3/26 02:59
-# 作者      : 叶之瞳
-# 文件名     : 11.py
+# 文件名     : train-dnn_lightgbm-model.py
+
 # -*- coding: utf-8 -*-
 """改进版TESS系外行星检测系统"""
 import pandas as pd
@@ -16,7 +14,7 @@ from sklearn.metrics import (roc_auc_score, f1_score, precision_score,
                              accuracy_score, confusion_matrix)
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+import shap
 plt.rcParams['font.sans-serif'] = ['SimHei']  # 使用黑体显示中文
 plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
 
@@ -215,6 +213,57 @@ def data_visualization(df):
     plt.show()
 
 # ----------------------
+# SHAP值分析模块
+# ----------------------
+# 修改后的shap_analysis函数
+def shap_analysis(model, raw_features, scaled_features, feature_names):
+    """兼容最新SHAP API的可视化函数"""
+    # 使用LightGBM模型解释
+    explainer = shap.TreeExplainer(model.lgb_model)
+
+    # 计算SHAP值（最新版本返回列表）
+    shap_values = explainer.shap_values(scaled_features)
+
+    # 二分类问题特殊处理（兼容新旧版本）
+    if isinstance(shap_values, list):
+        # 新版本返回的列表包含两个类别的SHAP值
+        # 取正类（index=1）的SHAP值
+        shap_values_matrix = np.array(shap_values[1])
+    else:
+        # 旧版本直接返回矩阵
+        shap_values_matrix = shap_values
+
+    # 确保维度正确
+    if len(shap_values_matrix.shape) == 1:
+        shap_values_matrix = shap_values_matrix.reshape(-1, 1)
+
+    # 1. 特征重要性图
+    plt.figure(figsize=(10, 6))
+    shap.summary_plot(shap_values_matrix,
+                      features=raw_features,
+                      feature_names=feature_names,
+                      plot_type="bar",
+                      show=False)
+    plt.title("SHAP特征重要性排序", fontsize=14)
+    plt.tight_layout()
+    plt.savefig('shap_feature_importance.png', dpi=300)
+    plt.close()
+
+    # 2. 摘要图
+    plt.figure(figsize=(10, 8))
+    shap.summary_plot(shap_values_matrix,
+                      features=raw_features,
+                      feature_names=feature_names,
+                      plot_type="dot",
+                      show=False)
+    plt.title("SHAP值分布摘要图", fontsize=14)
+    plt.tight_layout()
+    plt.savefig('shap_summary.png', dpi=300)
+    plt.close()
+
+
+# 主函数调用部分保持不变
+# ----------------------
 # 主流程（增强稳定性）
 # ----------------------
 if __name__ == "__main__":
@@ -245,6 +294,31 @@ if __name__ == "__main__":
     precision_scores, accuracy_scores = [], []
     all_y_test, all_y_pred = [], []
 
+#######################
+    # 在特征工程后保存原始特征数据
+    X_original = df[features].copy()  # <-- 新增行：保存原始特征值
+
+    # 标准化处理
+    final_scaler = RobustScaler()
+    X_final_scaled = final_scaler.fit_transform(X_original)  # <-- 使用X_original进行标准化
+
+    # 训练最终模型（注意：这里仅用于SHAP分析演示）
+    print("\n训练最终模型用于SHAP分析...")
+    final_model = HybridModel(input_shape=(X_final_scaled.shape[1],))
+
+    # 警告：此处仅为SHAP可视化演示，实际应使用独立验证集
+    final_model.train(X_final_scaled, y, X_final_scaled[:500], y[:500])  # <-- 使用前500样本作为验证集
+
+    # 生成SHAP可视化（使用前1000个样本）
+    # SHAP分析函数调用
+    shap_analysis(
+        model=final_model,
+        raw_features=X_original.values[:6000],  # 原始特征值矩阵
+        scaled_features=X_final_scaled[:6000],  # 标准化后的特征值矩阵
+        feature_names=features  # 特征名称列表
+    )
+    print("SHAP分析完成，结果已保存为PNG文件")
+###########################
     for fold, (train_idx, test_idx) in enumerate(skf.split(X_scaled, y)):
         print(f"\n=== Fold {fold + 1} ===")
 
@@ -281,6 +355,7 @@ if __name__ == "__main__":
         F1-score: {fold_f1:.4f}
         精确率: {fold_precision:.4f}
         准确率: {fold_accuracy:.4f}""")
+
 
     # 最终评估结果
     print("\n=== 最终评估结果 ===")

@@ -82,8 +82,8 @@
 **召回率**：93.3% | **精确率**：90.3%  
 
 ### 特征重要性（SHAP）  
-![SHAP 特征重要性](代码/shap_feature_importance.png)    
-![SHAP 摘要图](代码/shap_summary.png)  
+![SHAP 特征重要性](markdown图片使用/shap_feature_importance.png)    
+![SHAP 摘要图](markdown图片使用/shap_summary.png)  
 
 ---
 
@@ -99,3 +99,73 @@
 ```bash
 pip install pandas numpy lightgbm tensorflow scikit-learn matplotlib seaborn shap
 ```
+
+## 运行代码
+1. **准备数据**：将 TESS 数据文件（例如`tess_raw_data.xlsx`）放在项目根目录。
+2. **执行主流程**：
+```
+python main.py
+```
+该脚本将依次执行数据预处理、特征工程、交叉验证，并生成所有图表（指标趋势、混淆矩阵、SHAP 图）。
+## 主要脚本
+- `main.py`-完整训练与评估流程
+- `data_preprocessing.py`-数据加载、清洗与特征工程
+- `model.py`-DNN 和 LightGBM 混合模型定义
+- `visualization.py`-绘图工具（数据分布、指标、SHAP）
+
+
+## 📁 仓库结构
+
+```text
+|   data-download.py # 下载数据
+|   tess_raw_data.xlsx # 源数据
+|   train-dnn_lightgbm-model.py # 训练模型
+|
++---final-data
+|       COM_PowerSpect_CMB-base-plikHM-TTTEEE-lowl-lowE-lensing-minimum-theory_R3.01.txt
+|       COM_PowerSpect_CMB-base-plikHM-TTTEEE-lowl-lowE-lensing-minimum_R3.01.txt
+|
+\---photo
+        average_metrics.png
+        confusion_matrix.png
+        cross_validation_metrics.png
+        data_visualization.png
+        feature_importance.png
+        metrics_trend.png
+        shap_feature_importance.png
+        shap_summary.png
+```
+存在问题与改进方向
+
+当前模型仍存在一些局限，例如：
+
+对低信噪比信号的识别能力仍有提升空间
+
+对长周期行星受 TESS 观测窗口限制较大
+
+可继续引入多源数据融合和更强的数据增强策略
+
+未来可以考虑：
+
+引入更强的降噪模块
+
+融合 Kepler / CHEOPS 等多任务数据
+
+扩展到更长周期候选体检测
+
+尝试更完整的端到端时序建模框架
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
