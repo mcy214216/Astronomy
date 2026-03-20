@@ -1,5 +1,5 @@
-# 基于统计特征增强的轻量化行星检测模型  
-**——天文时序数据分析的创新方法**  
+# 基于统计特征增强的轻量化行星检测模型<font size=5>——天文时序数据分析的创新方法</font> 
+
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange)](https://www.tensorflow.org/)
@@ -135,7 +135,8 @@ pip install pandas numpy lightgbm tensorflow scikit-learn matplotlib seaborn sha
 - 融合 Kepler / CHEOPS 等多任务数据
 - 扩展到更长周期候选体检测
 - 尝试更完整的端到端时序建模框架
-- 
+
+
 ## 参考说明
 本项目内容整理自“基于统计特征增强的轻量化行星检测模型——天文时序数据分析的创新方法”研究工作，面向 GitHub 开源展示场景进行了结构化重写
 
