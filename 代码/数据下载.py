@@ -1,29 +1,21 @@
-import mmap
-import os
-from multiprocessing import Process
+import pandas as pd
+import requests
 
-def child_process(shm):
-    # 子进程写入数据
-    shm.seek(0)
-    shm.write(b"Hello, I am child process!")
-    shm.close()
+# 下载 TESS TOI 列表
+url = "https://exofop.ipac.caltech.edu/tess/download_toi.php?sort=toi&output=csv"
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
 
-def main():
-    # 创建匿名内存映射区域（兼容Windows的共享方式）
-    shm = mmap.mmap(-1, 1024)  # 分配1024字节
+try:
+    print("正在下载数据...")
+    response = requests.get(url, headers=headers, timeout=30)
+    response.encoding = 'utf-8'  # 或 'latin1' 如果出现编码错误
+    df = pd.read_csv(pd.compat.StringIO(response.text))
 
-    # 创建子进程
-    p = Process(target=child_process, args=(shm,))
-    p.start()
-    p.join()  # 等待子进程结束
+    # 保存为 Excel
+    df.to_excel("tess_raw_data.xlsx", index=False, engine='openpyxl')
+    # 同时保存 CSV 备份
+    df.to_csv("tess_raw_backup.csv", index=False, encoding='utf-8-sig')
 
-    # 父进程读取数据
-    shm.seek(0)
-    content = shm.read(shm.size()).split(b'\x00')[0]  # 去除空字节
-    print("Parent received:", content.decode())
-
-    # 关闭资源
-    shm.close()
-
-if __name__ == "__main__":
-    main()
+    print(f"下载完成！数据维度: {df.shape}，已保存为 tess_raw_data.xlsx")
+except Exception as e:
+    print(f"下载失败: {e}")

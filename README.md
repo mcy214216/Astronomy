@@ -82,8 +82,8 @@
 **召回率**：93.3% | **精确率**：90.3%  
 
 ### 特征重要性（SHAP）  
-![SHAP 特征重要性](figures/shap_feature_importance.png)  
-![SHAP 摘要图](figures/shap_summary.png)  
+![SHAP 特征重要性](代码/shap_feature_importance.png)    
+![SHAP 摘要图](代码/shap_summary.png)  
 
 ---
 
@@ -97,5 +97,5 @@
 
 安装依赖：  
 ```bash
-pip install -r requirements.txt
+pip install pandas numpy lightgbm tensorflow scikit-learn matplotlib seaborn shap
 ```
