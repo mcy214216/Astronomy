@@ -1,8 +1,8 @@
 # 基于统计特征增强的轻量化行星检测模型<font size=5>——天文时序数据分析的创新方法</font> 
 
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange)](https://www.tensorflow.org/)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)  
+[![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange)](https://www.tensorflow.org/)  
 [![LightGBM](https://img.shields.io/badge/LightGBM-3.x-green)](https://lightgbm.readthedocs.io/)
 
 本仓库包含用于 TESS 任务数据的系外行星候选体检测的混合深度学习模型实现。所提出的方法集成了**统计特征工程**、**DNN 特征抽象**和**LightGBM 分类**，以低计算成本实现高准确率，解决了传统方法误检率高、对小信号敏感度不足等问题。
